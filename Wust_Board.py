@@ -5,7 +5,7 @@ import dash_html_components as html
 from dash.dependencies import Input, Output
 import plotly.graph_objs as go
 import pandas as pd
-# import pendulum
+import pendulum as pen
 
 
 
@@ -19,27 +19,21 @@ df = pd.read_csv("https://docs.google.com/spreadsheets/d/{key}/gviz/tq?tqx=out:c
 
 Indicators = df.columns[1:4]
 
+days = (pen.today() - pen.create(2018,5,18)).days
+
 app = dash.Dash('hello')
 # app.title('Wuesthof')
+
 server = app.server
 app.layout = html.Div([
 
     html.Div([
-        html.Div([
-            html.H2('Wuest_Board: an intelligence dashboard designed for the kitchen brand:Wuesthof',style={'fontFamily':'Roboto'}),
+
+            html.H2('Wuest_Board: an intelligence dashboard designed for the kitchen brand:Wuesthof',style={'fontFamily':'roboto','width':'60%','display':'inline-block'}),
+            html.Img(src='https://upload.wikimedia.org/wikipedia/en/a/a4/Wusthof_Logo.png',style={'display':'inline-block','verticalAlign':'sub','marginLeft':100}),
 
 
-        ],style={'width':'70%','display':'inline-block'}),
-
-        html.Div([
-            html.Img(src='https://upload.wikimedia.org/wikipedia/en/a/a4/Wusthof_Logo.png')
-
-
-        ],style={'width':'20%','display':'inline-block','marginTop':20})
-
-
-
-    ],style={'margin':5}),
+        ],style={'marginLeft':20,'marginTop':20}),
 
 
     html.Div([
@@ -55,16 +49,14 @@ app.layout = html.Div([
                 options=[{'label':i,'value':i} for i in Indicators],
                 value = 'Price',)],style={'width':'48%','display':'inline-block'}),
 
-
-
-
-
-
             ],style={
         'borderBottom': 'thin lightgrey solid',
         'backgroundColor': 'rgb(250, 250, 250)',
         'padding': '10px 5px'
     }),
+
+
+
 
     html.Div([
         dcc.Graph(id='Plot',
@@ -72,34 +64,35 @@ app.layout = html.Div([
         # dcc.Dropdown(id='date_picker',
         #             options=date_options,
         #             value=df['Date'][0])
-        ],style={'width': '49%', 'display': 'inline-block', 'height':'500'}),
-
+        ],style={'width':'48%','display':'inline-block'}),
 
     html.Div([
+        html.Div([
+            dcc.Graph(id='x-timeseries'),
 
-    dcc.Graph(id='x-timeseries'),
-    dcc.Graph(id='y-timeseries'),
+        ],style={'marginLeft':10}),
+        html.Div([
+            dcc.Graph(id='y-timeseries'),
 
-
-
-
-
-
-    ],style={'display': 'inline-block', 'width': '49%','marginLeft':10}),
-
+        ],style={'marginLeft':10}),
+        ],style={'display': 'inline-block', 'width': '48%','marginLeft':10}),
 
 
     html.Div([
     dcc.Slider(id='Date-Slider',
-    min = df['Date'].min(),
-    max = df['Date'].max(),
-    value = df['Date'].max(),
-    step = None,
-    marks = {str(i):str(i) for i in df['Date'].unique()})
-    ],style={'width': '48%', 'display': 'inline-block','padding': '0px 20px 20px 20px','marginLeft':10}),
+                min= df['Date'].unique().min(),
+                max= 20180531,
+                value = 20180531,
+                step = None,
+                marks ={str(i): str(i) for i in df['Date'].unique()}
+                )
+
+    ],style={'width': '95%', 'display': 'inline-block','padding': '0px 20px 20px 20px','marginLeft':10}),
 
 
 
+
+    
 
 ])
 
@@ -109,7 +102,6 @@ app.layout = html.Div([
                 Input('xaxis','value'),
                 Input('yaxis','value')]
                 )
-
 def update_plot(selected_Date,xaxis_name,yaxis_name):
 
     filtered_df = df[df['Date']==selected_Date]
@@ -134,7 +126,7 @@ def update_plot(selected_Date,xaxis_name,yaxis_name):
     return {'data':traces,
             'layout':
                     go.Layout(
-                    title = 'Wuesthof Analytics Dashboard',
+                    title = 'Wuesthof Scatter Plot',
                     xaxis= {'title':xaxis_name},
                     yaxis = {'title':yaxis_name},
                     hovermode='closest')
@@ -154,11 +146,14 @@ def update_x_series(hoverData, xaxis_column_name):
 
     item_name = hoverData['points'][0]['customdata']
     dff = df[df['Name']==item_name]
+    # dff['new_date'] = pd.to_datetime(dff['Timestamp'],unit='s')
+    # dff.set_index('new_date',inplace=True)
     title = '<b>{}</b><br>{}'.format(item_name, xaxis_column_name)
 
     figure = {
         'data': [go.Scatter(
-            x=dff['Date'].unique(),
+            x=dff['Date_Dashed'].unique(),
+            # x=dff.index,
             y=dff[xaxis_column_name],
             mode='lines+markers'
         )],
@@ -187,11 +182,14 @@ def update_y_series(hoverData, yaxis_column_name):
 
     item_name = hoverData['points'][0]['customdata']
     dff = df[df['Name']==item_name]
+    # dff['new_date'] = pd.to_datetime(dff['Timestamp'],unit='s')
+    # dff.set_index('new_date',inplace=True)
     title = '<b>{}</b><br>{}'.format(item_name, yaxis_column_name)
 
     figure = {
         'data': [go.Scatter(
-            x=dff['Date'].unique(),
+            # x=dff.index,
+            x=dff['Date_Dashed'].unique(),
             y=dff[yaxis_column_name],
             mode='lines+markers'
         )],
