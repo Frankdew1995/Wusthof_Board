@@ -1,6 +1,4 @@
-## Demo Screenshot
-
-![Image of Yaktocat](/Users/frankdu/Learn_Dash_Plotly/Wusthof/Demo.png)
+## Demo
 
 See it live [here](https://wusthofboard.herokuapp.com/)
 
