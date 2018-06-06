@@ -19,7 +19,7 @@ df = pd.read_csv("https://docs.google.com/spreadsheets/d/{key}/gviz/tq?tqx=out:c
 
 Indicators = df.columns[1:4]
 
-days = (pen.today() - pen.create(2018,5,18)).days
+# days = (pen.today() - pen.create(2018,5,18)).days
 
 app = dash.Dash('hello')
 # app.title('Wuesthof')
@@ -92,7 +92,7 @@ app.layout = html.Div([
 
 
 
-    
+
 
 ])
 
