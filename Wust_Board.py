@@ -22,7 +22,7 @@ Indicators = df.columns[1:4]
 # days = (pen.today() - pen.create(2018,5,18)).days
 
 app = dash.Dash('hello')
-# app.title('Wuesthof')
+app.title = 'Wuest_Board'
 
 server = app.server
 app.layout = html.Div([
